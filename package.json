@@ -1,0 +1,26 @@
+{
+  "name": "exceptionout",
+  "version": "0.0.1",
+  "author": "Bartosz Michalkiewicz <bmichalkiewicz@gmail.com>",
+  "description": "no more exceptions",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "repository": "https://github.com/b-michalkiewicz/exceptionout",
+  "license": "MIT",
+  "keywords": [
+    "functional programming",
+    "typescript",
+    "exception"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^26.0.0",
+    "ts-jest": "^26.1.0",
+    "jest": "^26.0.1",
+    "typescript": "^3.9.5"
+  }
+}
