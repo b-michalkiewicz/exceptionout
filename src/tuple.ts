@@ -1,4 +1,4 @@
-import { exceptionout, formatError, TypeGuard } from "../exceptionout";
+import { exceptionout, formatError, TypeGuard } from "./exceptionout";
 
 export type Tuple<R, E extends Error = Error> = [E?, R?];
 

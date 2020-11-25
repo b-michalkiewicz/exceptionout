@@ -1,4 +1,4 @@
-import { exceptionout, formatError, TypeGuard } from "../exceptionout";
+import { exceptionout, formatError, TypeGuard } from "./exceptionout";
 
 export type Result<Input> = Error | Input;
 

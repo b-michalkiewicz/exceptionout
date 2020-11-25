@@ -1,3 +1,3 @@
-export * from "./either/either";
-export * from "./result/result";
-export * from "./tuple/tuple";
+export * from "./either";
+export * from "./result";
+export * from "./tuple";

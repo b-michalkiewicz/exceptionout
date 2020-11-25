@@ -1,4 +1,4 @@
-import { exceptionout, TypeGuard } from "../exceptionout";
+import { exceptionout, TypeGuard } from "./exceptionout";
 
 export interface Either<Left, Right> {
     isLeft(): boolean;
