@@ -1,12 +1,14 @@
-# exceptionout - no more exceptions
+# exceptionout = no more exceptions
 
-With `exceptionout` you can get rid of exceptions and write your code in more predictable (functional) way
+With `exceptionout` you can get rid of exceptions and write your code in more predictable, functional way.  
+Simply wrap code that may throw, in one of the following functions and deal with error in an easy way.
 
 ---
 
 ## Table of Contents
 
 -   [Either](#Either)
+-   [Optional](#Optional)
 -   [Result](#Result)
 -   [Tuple](#Tuple)
 
@@ -17,15 +19,37 @@ With `exceptionout` you can get rid of exceptions and write your code in more pr
 `Either` is inspired by either monad and stands for either Left (error) or Right (success).
 
 ```typescript
-import { getEither } from "exceptionout";
+import { either } from "exceptionout";
 
-...
-const externalCall = Math.random() >= 0.5 ? Promise.resolve(1) : Promise.reject(new Error("external error"));
-const result = await getEither(externalCall, (e) => e);
+const externalCall = Math.random() >= 0.5 
+  ? Promise.resolve(42) 
+  : Promise.reject(new Error("external error"));
+
+const result = await either(externalCall, (e) => e);
 
 result
   .mapRight((r) => r.toFixed(1)) // r is number
   .mapLeft((l) => l.message) // l is Error
+```
+
+---
+
+## Optional
+
+`Optional` means value or `undefined` if an error occurred.
+
+```typescript
+import { either } from "exceptionout";
+
+const externalCall = Math.random() >= 0.5 
+  ? Promise.resolve(42) 
+  : Promise.reject(new Error("external error"));
+
+const result = await optional(externalCall);
+
+if (result) {
+    result.toFixed(1); // result is number
+}
 ```
 
 ---
@@ -35,11 +59,13 @@ result
 `Result` is an union type of Error or success T.
 
 ```typescript
-import { getResult, isSuccess } from "exceptionout";
+import { result, isSuccess } from "exceptionout";
 
-...
-const externalCall = Math.random() >= 0.5 ? Promise.resolve(1) : Promise.reject(new Error("external error"));
-const result = await getResult(externalCall);
+const externalCall = Math.random() >= 0.5 
+  ? Promise.resolve(42) 
+  : Promise.reject(new Error("external error"));
+
+const result = await result(externalCall);
 
 if (isSuccess(result)) {
   result.toFixed(1); // result is number
@@ -55,18 +81,19 @@ if (isSuccess(result)) {
 `Tuple` represents a tuple of Error and success T.
 
 ```typescript
-import { getTuple } from "exceptionout";
+import { tuple } from "exceptionout";
 
-...
-const externalCall = Math.random() >= 0.5 ? Promise.resolve(1) : Promise.reject(new Error("external error"));
-const [, success] = await getTuple(externalCall);
+const externalCall = () => Math.random() >= 0.5 
+  ? Promise.resolve(42) 
+  : Promise.reject(new Error("external error"));
+
+const [, success] = await tuple(externalCall());
 
 if (success) {
     success.toFixed(1); // success
 }
 
-const nextExternalCall = Math.random() >= 0.5 ? Promise.resolve(1) : Promise.reject(new Error("external error"));
-const [error] = await getTuple(nextExternalCall);
+const [error] = await tuple(externalCall());
 
 if (error) {
     error.message; // error
