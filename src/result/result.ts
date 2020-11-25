@@ -1,27 +1,17 @@
-export type Result<T> = Error | T;
+import { exceptionout, formatError, TypeGuard } from "../exceptionout";
+
+export type Result<Input> = Error | Input;
 
 export function isError(result: Result<unknown>): result is Error {
     return result instanceof Error;
 }
 
-export function isSuccess<T>(result: Result<T>): result is T {
+export function isSuccess<Input>(result: Result<Input>): result is Input {
     return !isError(result);
 }
 
-export function getResult<T>(f: () => T, typeGuard?: (o: unknown) => o is T): Result<T>;
-export function getResult<T>(f: Promise<T>, typeGuard?: (o: unknown) => o is T): Promise<Result<T>>;
-export function getResult<T>(f: Promise<T> | (() => T), typeGuard?: (o: unknown) => o is T): Promise<Result<T>> | Result<T> {
-    const useTypeGuard = (result: T) => (typeGuard && !typeGuard(result) ? new Error("Type guard validation failed") : result);
-
-    if (typeof f !== "function") return f.then(useTypeGuard).catch(formatError);
-
-    try {
-        return useTypeGuard(f());
-    } catch (error) {
-        return formatError(error);
-    }
-}
-
-function formatError(error: any) {
-    return error instanceof Error ? error : new Error(error?.message || "Unknown error");
+export function result<Input>(f: () => Input, typeGuard?: TypeGuard<Input>): Result<Input>;
+export function result<Input>(f: Promise<Input>, typeGuard?: TypeGuard<Input>): Promise<Result<Input>>;
+export function result<Input>(f: Promise<Input> | (() => Input), typeGuard?: TypeGuard<Input>): Promise<Result<Input>> | Result<Input> {
+    return exceptionout<Input, Result<Input>>(f, (i) => i, formatError, typeGuard);
 }

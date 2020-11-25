@@ -1,3 +1,5 @@
+import { exceptionout, TypeGuard } from "../exceptionout";
+
 export interface Either<Left, Right> {
     isLeft(): boolean;
     isRight(): boolean;
@@ -53,22 +55,17 @@ export class Right<R> implements Either<never, R> {
     }
 }
 
-export function getEither<L, R>(f: () => R, e: <E extends Error>(e: E) => L, t?: (o: unknown) => o is R): Promise<Either<L, R>>;
-export function getEither<L, R>(f: Promise<R>, e: <E extends Error>(e: E) => L, t?: (o: unknown) => o is R): Promise<Either<L, R>>;
-export function getEither<Left, Right>(
+export function either<Left, Right>(f: () => Right, e: (e: unknown) => Left, typeGuard?: TypeGuard<Right>): Promise<Either<Left, Right>>;
+export function either<Left, Right>(f: Promise<Right>, e: (e: unknown) => Left, typeGuard?: TypeGuard<Right>): Promise<Either<Left, Right>>;
+export function either<Left, Right>(
     f: (() => Right) | Promise<Right>,
-    errorMapper: <E extends Error>(e: E) => Left,
-    typeGuard?: (o: unknown) => o is Right,
+    errorMapper: (e: unknown) => Left,
+    typeGuard?: TypeGuard<Right>,
 ): Promise<Either<Left, Right>> | Either<Left, Right> {
-    const useTypeGuard = (result: Right) =>
-        typeGuard && !typeGuard(result) ? formatLeft(errorMapper(new Error("Type guard validation failed"))) : Right.of(result);
-    const formatLeft = (error: any) => Left.of(errorMapper(error));
-
-    if (typeof f !== "function") return f.then(useTypeGuard).catch(formatLeft);
-
-    try {
-        return useTypeGuard(f());
-    } catch (error) {
-        return formatLeft(error);
-    }
+    return exceptionout<Right, Either<Left, Right>>(
+        f,
+        (v) => Right.of(v),
+        (e) => Left.of(errorMapper(e)),
+        typeGuard,
+    );
 }
