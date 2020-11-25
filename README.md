@@ -6,9 +6,9 @@ With `exceptionout` you can get rid of exceptions and write your code in more pr
 
 ## Table of Contents
 
-- [Either](#Either)
-- [Result](#Result)
-- [Tuple](#Tuple)
+-   [Either](#Either)
+-   [Result](#Result)
+-   [Tuple](#Tuple)
 
 ---
 
@@ -23,11 +23,9 @@ import { getEither } from "exceptionout";
 const externalCall = Math.random() >= 0.5 ? Promise.resolve(1) : Promise.reject(new Error("external error"));
 const result = await getEither(externalCall, (e) => e);
 
-console.log(
-  result
-    .mapRight((r) => r + 1) // r is number
-    .mapLeft((l) => l.message) // l is Error
-);
+result
+  .mapRight((r) => r.toFixed(1)) // r is number
+  .mapLeft((l) => l.message) // l is Error
 ```
 
 ---
@@ -44,9 +42,9 @@ const externalCall = Math.random() >= 0.5 ? Promise.resolve(1) : Promise.reject(
 const result = await getResult(externalCall);
 
 if (isSuccess(result)) {
-  console.log(result + 1); // result is number
+  result.toFixed(1); // result is number
 } else {
-  console.log(result.message); // result is Error
+  result.message; // result is Error
 }
 ```
 
@@ -63,14 +61,14 @@ import { getTuple } from "exceptionout";
 const externalCall = Math.random() >= 0.5 ? Promise.resolve(1) : Promise.reject(new Error("external error"));
 const [, success] = await getTuple(externalCall);
 
-if (success) { // success is number | undefined
-    console.log(success + 1);
+if (success) {
+    success.toFixed(1); // success
 }
 
 const nextExternalCall = Math.random() >= 0.5 ? Promise.resolve(1) : Promise.reject(new Error("external error"));
 const [error] = await getTuple(nextExternalCall);
 
-if (error) { // error is Error | undefined
-    console.log(error.message);
+if (error) {
+    error.message; // error
 }
 ```
