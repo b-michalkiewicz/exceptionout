@@ -1,13 +1,10 @@
-import { exceptionout } from "./exceptionout";
+import { exceptionout, Output, Provider } from "./exceptionout";
 
-export type Optional<Input> = Input | undefined;
+export type Optional<Result> = Result | undefined;
 
-export function optional<Input>(f: () => Input): Optional<Input>;
-export function optional<Input>(f: Promise<Input>): Promise<Optional<Input>>;
-export function optional<Input>(f: Promise<Input> | (() => Input)): Promise<Optional<Input>> | Optional<Input> {
-    return exceptionout(
-        f,
-        (v) => v,
+export const optional = <Result>(provider: Provider<Result>): Output<Provider<Result>, Optional<Result>> =>
+    exceptionout(
+        provider,
+        (r) => r,
         () => undefined,
     );
-}

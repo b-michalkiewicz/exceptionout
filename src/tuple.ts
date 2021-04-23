@@ -1,14 +1,11 @@
-import { exceptionout, formatError, TypeGuard } from "./exceptionout";
+import { exceptionout, formatError, Output, Provider, TypeGuard } from "./exceptionout";
 
-export type Tuple<R, E extends Error = Error> = [E?, R?];
+export type Tuple<Result, E extends Error = Error> = [E?, Result?];
 
-export function tuple<Input>(f: () => Input, typeGuard?: TypeGuard<Input>): Tuple<Input>;
-export function tuple<Input>(f: Promise<Input>, typeGuard?: TypeGuard<Input>): Promise<Tuple<Input>>;
-export function tuple<Input>(f: (() => Input) | Promise<Input>, typeGuard?: TypeGuard<Input>): Promise<Tuple<Input>> | Tuple<Input> {
-    return exceptionout<Input, Tuple<Input>>(
-        f,
+export const tuple = <Result>(provider: Provider<Result>, typeGuard?: TypeGuard<Result>): Output<Provider<Result>, Tuple<Result>> =>
+    exceptionout(
+        provider,
         (i) => [undefined, i],
-        (e) => [formatError(e)],
+        (e): Tuple<Result> => [formatError(e)],
         typeGuard,
     );
-}

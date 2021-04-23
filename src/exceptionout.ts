@@ -1,20 +1,22 @@
+export type Provider<Result = unknown> = Promise<Result> | (() => Result);
 export type TypeGuard<T> = (o: unknown) => o is T;
+export type Output<P extends Provider, Wrapper> = P extends Promise<unknown> ? Promise<Wrapper> : P extends () => unknown ? Wrapper : unknown;
 
-export function exceptionout<Input, Output>(
-    f: Promise<Input> | (() => Input),
-    valueMapper: (i: Input) => Output,
-    errorMapper: (e?: unknown) => Output,
-    typeGuard?: TypeGuard<Input>,
-): Promise<Output> | Output {
-    const useTypeGuard = (result: Input) => {
+export function exceptionout<Result, Wrapper>(
+    provider: Provider<Result>,
+    resultMapper: (i: Result) => Wrapper,
+    errorMapper: (e?: unknown) => Wrapper,
+    typeGuard?: TypeGuard<Result>,
+): Output<Provider<Result>, Wrapper> {
+    const useTypeGuard = (result: Result) => {
         if (typeGuard && !typeGuard(result)) throw new Error("Type guard validation failed");
         return result;
     };
 
-    if (typeof f !== "function") return f.then(useTypeGuard).then(valueMapper).catch(errorMapper);
+    if (typeof provider !== "function") return provider.then(useTypeGuard).then(resultMapper).catch(errorMapper);
 
     try {
-        return valueMapper(useTypeGuard(f()));
+        return resultMapper(useTypeGuard(provider()));
     } catch (error) {
         return errorMapper(error);
     }

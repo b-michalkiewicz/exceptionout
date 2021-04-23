@@ -25,7 +25,7 @@ const externalCall = Math.random() >= 0.5
   ? Promise.resolve(42) 
   : Promise.reject(new Error("external error"));
 
-const result = await either(externalCall, (e) => e);
+const result = await either(externalCall, () => new Error("error"));
 
 result
   .mapRight((r) => r.toFixed(1)) // r is number

@@ -1,4 +1,4 @@
-import { exceptionout, TypeGuard } from "./exceptionout";
+import { exceptionout, Output, Provider, TypeGuard } from "./exceptionout";
 
 export interface Either<Left, Right> {
     isLeft(): boolean;
@@ -55,17 +55,14 @@ export class Right<R> implements Either<never, R> {
     }
 }
 
-export function either<Left, Right>(f: () => Right, e: (e: unknown) => Left, typeGuard?: TypeGuard<Right>): Promise<Either<Left, Right>>;
-export function either<Left, Right>(f: Promise<Right>, e: (e: unknown) => Left, typeGuard?: TypeGuard<Right>): Promise<Either<Left, Right>>;
-export function either<Left, Right>(
-    f: (() => Right) | Promise<Right>,
+export const either = <Left, Right>(
+    provider: Provider<Right>,
     errorMapper: (e: unknown) => Left,
     typeGuard?: TypeGuard<Right>,
-): Promise<Either<Left, Right>> | Either<Left, Right> {
-    return exceptionout<Right, Either<Left, Right>>(
-        f,
-        (v) => Right.of(v),
-        (e) => Left.of(errorMapper(e)),
+): Output<Provider<Right>, Either<Left, Right>> =>
+    exceptionout(
+        provider,
+        (r) => Right.of(r),
+        (l): Either<Left, Right> => Left.of(errorMapper(l)),
         typeGuard,
     );
-}
