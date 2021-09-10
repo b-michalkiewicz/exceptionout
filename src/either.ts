@@ -1,18 +1,19 @@
 import { exceptionout, Output, Provider, TypeGuard } from "./exceptionout";
 
-export interface Either<Left, Right> {
-    isLeft(): boolean;
-    isRight(): boolean;
-    mapLeft<T>(f: (l: Left) => T): Either<T, Right>;
-    mapRight<T>(f: (r: Right) => T): Either<Left, T>;
-}
-
-export class Left<L> implements Either<L, never> {
+export class Left<Error> {
     public static of<T>(value: T): Left<T> {
         return new Left(value);
     }
 
-    private constructor(private readonly value: L) {}
+    private constructor(private readonly _value: Error) {}
+
+    get value(): Error {
+        return this._value;
+    }
+
+    map(): Left<Error> {
+        return this;
+    }
 
     isLeft(): boolean {
         return true;
@@ -21,22 +22,22 @@ export class Left<L> implements Either<L, never> {
     isRight(): boolean {
         return false;
     }
-
-    mapLeft<T>(f: (l: L) => T): Either<T, never> {
-        return Left.of(f(this.value));
-    }
-
-    mapRight(): Either<L, never> {
-        return this;
-    }
 }
 
-export class Right<R> implements Either<never, R> {
+export class Right<Value> {
     public static of<T>(value: T): Right<T> {
         return new Right(value);
     }
 
-    private constructor(private readonly value: R) {}
+    private constructor(private readonly _value: Value) {}
+
+    get value(): Value {
+        return this._value;
+    }
+
+    map<T>(mapper: (value: Value) => T): Right<T> {
+        return Right.of(mapper(this.value));
+    }
 
     isLeft(): boolean {
         return false;
@@ -45,15 +46,10 @@ export class Right<R> implements Either<never, R> {
     isRight(): boolean {
         return true;
     }
-
-    mapLeft(): Either<never, R> {
-        return this;
-    }
-
-    mapRight<T>(f: (r: R) => T): Either<never, T> {
-        return Right.of(f(this.value));
-    }
 }
+
+export type Either<Error, Value> = Left<Error> | Right<Value>;
+export const isEither = (o: unknown): o is Either<unknown, unknown> => o instanceof Left || o instanceof Right;
 
 export const either = <Left, Right>(
     provider: Provider<Right>,
