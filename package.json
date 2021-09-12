@@ -1,6 +1,6 @@
 {
     "name": "exceptionout",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "author": "Bartosz Michalkiewicz <bmichalkiewicz@gmail.com>",
     "description": "no more exceptions",
     "main": "dist/index.js",
