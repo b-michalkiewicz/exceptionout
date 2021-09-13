@@ -15,6 +15,14 @@ export class Left<Error> {
         return this;
     }
 
+    mapLeft<T>(mapper: (error: Error) => T): Either<T, never> {
+        return Left.of(mapper(this.value));
+    }
+
+    mapRight(): Either<Error, never> {
+        return this;
+    }
+
     isLeft(): boolean {
         return true;
     }
@@ -36,6 +44,14 @@ export class Right<Value> {
     }
 
     map<T>(mapper: (value: Value) => T): Right<T> {
+        return Right.of(mapper(this.value));
+    }
+
+    mapLeft(): Either<never, Value> {
+        return this;
+    }
+
+    mapRight<T>(mapper: (value: Value) => T): Either<never, T> {
         return Right.of(mapper(this.value));
     }
 
